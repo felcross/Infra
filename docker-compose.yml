@@ -24,7 +24,7 @@ services:
       - mongo_data:/data/db
 
   usuario:
-    build: ./usuario
+    image: felcross/usuario:latest
     container_name: usuario
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_usuario
@@ -39,7 +39,7 @@ services:
       - rede
 
   tarefas:
-    build: ./tarefas
+    image: felcross/tarefas:latest
     container_name: tarefas
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/db_agendador
@@ -54,7 +54,7 @@ services:
       - rede
 
   notificacao:
-    build: ./notificacao
+    image: felcross/notificacao:latest
     container_name: notificacao
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_usuario
@@ -69,7 +69,7 @@ services:
       - rede
 
   bff:
-    build: ./bff-agendador
+    image: felcross/bff-agendador:latest
     container_name: bff-agendador
     environment:
       USUARIO_URL: http://usuario:8080/usuario

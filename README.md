@@ -61,7 +61,7 @@ MAIL_PASSWORD=          # cole aqui sua senha de app do Gmail
 docker compose up -d
 ```
 
-Aguarde todos os containers subirem (pode levar 1-2 minutos na primeira vez).
+As imagens são baixadas automaticamente do Docker Hub. Aguarde todos os containers subirem (pode levar 1-2 minutos na primeira vez).
 
 **4. Verifique se está tudo rodando**
 ```bash
@@ -89,7 +89,7 @@ Após subir o projeto, acesse a documentação interativa de cada serviço:
 
 1. **Cadastre um usuário** → `POST /usuario`
 2. **Faça login** → `POST /usuario/login` e copie o token JWT retornado
-3. **Autorize no Swagger** → clique no botão 🔒 **Authorize** e cole o token no formato `Bearer seu_token`
+3. **Autorize no Swagger** → Autorize no Swagger → clique no botão 🔒 Authorize e cole o token retornado pelo login diretamente no campo, sem nenhum prefixo.
 4. **Crie uma tarefa** → `POST /tarefas` com data/hora de agendamento
 5. **Aguarde o e-mail** → o sistema verifica automaticamente a cada 30 segundos e envia notificação quando o horário da tarefa se aproxima
 
@@ -123,15 +123,12 @@ docker compose down
 
 ## 📁 Estrutura do projeto
 
+```
 Infra/
 ├── docker-compose.yml
 ├── .env.example
 ├── .gitignore
 └── README.md
+```
 
-Microsserviços (repositórios separados):
-├── bff-agendador
-├── notificacao
-├── tarefas
-└── usuario
-
+> Os microsserviços possuem repositórios próprios no GitHub e as imagens estão publicadas no [Docker Hub](https://hub.docker.com/u/felcross).
