@@ -1,0 +1,93 @@
+services:
+
+  postgres:
+    image: postgres:latest
+    container_name: dbpostgres-agendador
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: db_usuario
+    ports:
+      - "5434:5432"
+    networks:
+      - rede
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - rede
+    volumes:
+      - mongo_data:/data/db
+
+  usuario:
+    build: ./usuario
+    container_name: usuario
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_usuario
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - rede
+
+  tarefas:
+    build: ./tarefas
+    container_name: tarefas
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/db_agendador
+      USUARIO_URL: http://usuario:8080
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+      - usuario
+    networks:
+      - rede
+
+  notificacao:
+    build: ./notificacao
+    container_name: notificacao
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_usuario
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+    networks:
+      - rede
+
+  bff:
+    build: ./bff-agendador
+    container_name: bff-agendador
+    environment:
+      USUARIO_URL: http://usuario:8080/usuario
+      TAREFAS_URL: http://tarefas:8081/tarefas
+      NOTIFICACAO_URL: http://notificacao:8082/email
+    ports:
+      - "8083:8083"
+    depends_on:
+      - usuario
+      - tarefas
+      - notificacao
+    networks:
+      - rede
+
+networks:
+  rede:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongo_data:
