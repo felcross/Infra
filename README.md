@@ -49,7 +49,6 @@ Abra o `.env` e preencha **apenas** a senha do seu e-mail Gmail:
 JWT_SECRET=c3VhLWNoYXZlLXNlY3JldGEtc3VwZXItc2VndXJhLXF1ZS1kZXZlLXNlci1iZW0tbG9uZ2E=
 DB_USERNAME=postgres
 DB_PASSWORD=123
-MONGO_URI=mongodb://mongodb:27017/db_agendador
 MAIL_PASSWORD=          # cole aqui sua senha de app do Gmail
 ```
 

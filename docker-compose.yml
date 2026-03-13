@@ -1,25 +1,37 @@
 services:
-
   postgres:
-    image: postgres:latest
+    image: postgres:16
     container_name: dbpostgres-agendador
     environment:
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: db_usuario
     ports:
       - "5434:5432"
     networks:
       - rede
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d db_usuario"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   mongodb:
-    image: mongo:latest
+    image: mongo:7
     container_name: mongodb
     ports:
       - "27017:27017"
     networks:
       - rede
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     volumes:
       - mongo_data:/data/db
 
@@ -34,7 +46,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - rede
 
@@ -43,13 +56,15 @@ services:
     container_name: tarefas
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/db_agendador
-      USUARIO_URL: http://usuario:8080
+      USUARIO_URL: http://usuario:8080/usuario
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8081:8081"
     depends_on:
-      - mongodb
-      - usuario
+      mongodb:
+        condition: service_healthy
+      usuario:
+        condition: service_started
     networks:
       - rede
 
@@ -64,7 +79,8 @@ services:
     ports:
       - "8082:8082"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - rede
 
